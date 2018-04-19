@@ -9,10 +9,11 @@ module.exports = function run (context) {
 
   db('messages')
     .where('created_at', '<', Date.now() / 1000 - 2 * 24 * 60 * 60)
-    .then(() => null)
-    .catch(error => null)
     .then(() => {
       console.log('cleaned up db')
-      process.exit(0)
+      context.done()
+    })
+    .catch(error => {
+      context.done(error)
     })
 }
