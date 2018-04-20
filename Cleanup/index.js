@@ -1,28 +1,11 @@
-const knex = require('knex')
-const path = require('path')
+const axios = require('axios')
 
-module.exports = function run (context) {
+module.exports = async function run (context) {
   try {
     context.log('Start cleanup')
-
-    const db = require('knex')({
-      dialect: 'sqlite3',
-      connection: { filename: path.join(__dirname, '../messages.db') }
-    })
-
-    context.log('Connected to DB')
-
-    db('messages')
-      .where('created_at', '<', Date.now() / 1000 - 2 * 24 * 60 * 60)
-      .del()
-      .then(() => {
-        context.log('Cleaned up DB')
-        context.done()
-      })
-      .catch(error => {
-        context.log('Failed to clean up DB')
-        context.done(error)
-      })
+    await axios.get(process.env.CHAT_CLEANUP_URL)
+    context.log('Finished cleanup')
+    context.done()
   } catch (error) {
     context.log('An error occurred')
     context.done(error)
